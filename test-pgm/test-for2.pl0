@@ -1,0 +1,10 @@
+const 
+  N = 5;
+var
+  i: int;
+  j: int;
+begin
+  for i: [1..N] do
+    for j: [1..N] do
+      write i*j
+end
