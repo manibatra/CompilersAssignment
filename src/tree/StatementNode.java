@@ -83,15 +83,61 @@ public abstract class StatementNode {
     	
     }
 
+//    /** Tree node representing an assignment statement. */
+//    public static class AssignmentNode extends StatementNode {
+//        /** Tree node for expression on left hand side of an assignment. */
+//        private ExpNode variable;
+//        /** Tree node for the expression to be assigned. */
+//        private ExpNode exp;
+//
+//        public AssignmentNode( Position pos, ExpNode variable, 
+//                ExpNode exp ) {
+//            super( pos );
+//            this.variable = variable;
+//            this.exp = exp;
+//        }
+//        @Override
+//        public void accept( StatementVisitor visitor ) {
+//            visitor.visitAssignmentNode( this );
+//        }
+//        @Override
+//        public Code genCode( StatementTransform<Code> visitor ) {
+//            return visitor.visitAssignmentNode( this );
+//        }
+//        public ExpNode getVariable() {
+//            return variable;
+//        }
+//        public void setVariable( ExpNode variable ) {
+//            this.variable = variable;
+//        }
+//        public ExpNode getExp() {
+//            return exp;
+//        }
+//        public void setExp(ExpNode exp) {
+//            this.exp = exp;
+//        }
+//        public String getVariableName() {
+//            if( variable instanceof ExpNode.VariableNode ) {
+//                return ((ExpNode.VariableNode)variable).getId();
+//            } else {
+//                return "<noname>";
+//            }
+//        }
+//        @Override
+//        public String toString( ) {
+//            return variable.toString() + " := " + exp.toString();
+//        }
+//    }
+
     /** Tree node representing an assignment statement. */
     public static class AssignmentNode extends StatementNode {
         /** Tree node for expression on left hand side of an assignment. */
-        private ExpNode variable;
+        private List<ExpNode> variable;
         /** Tree node for the expression to be assigned. */
-        private ExpNode exp;
+        private List<ExpNode> exp;
 
-        public AssignmentNode( Position pos, ExpNode variable, 
-                ExpNode exp ) {
+        public AssignmentNode( Position pos, List<ExpNode> variable, 
+                List<ExpNode> exp ) {
             super( pos );
             this.variable = variable;
             this.exp = exp;
@@ -104,31 +150,60 @@ public abstract class StatementNode {
         public Code genCode( StatementTransform<Code> visitor ) {
             return visitor.visitAssignmentNode( this );
         }
-        public ExpNode getVariable() {
+        public List<ExpNode> getVariable() {
             return variable;
         }
-        public void setVariable( ExpNode variable ) {
+        public void setVariable( List<ExpNode> variable ) {
             this.variable = variable;
         }
-        public ExpNode getExp() {
+        public List<ExpNode> getExp() {
             return exp;
         }
-        public void setExp(ExpNode exp) {
+        public void setExp(List<ExpNode> exp) {
             this.exp = exp;
         }
-        public String getVariableName() {
-            if( variable instanceof ExpNode.VariableNode ) {
-                return ((ExpNode.VariableNode)variable).getId();
-            } else {
-                return "<noname>";
-            }
+        public List<String> getVariableName() {
+        	
+        	List<String> varNames = new ArrayList<String>();
+        	for(ExpNode var : variable){
+        		
+        		if( var instanceof ExpNode.VariableNode ) {
+                    varNames.add(((ExpNode.VariableNode)var).getId());
+                } else {
+                	varNames.add("<noname>");
+                }
+        		
+        	}
+        	
+            return varNames;
         }
         @Override
         public String toString( ) {
-            return variable.toString() + " := " + exp.toString();
+        	
+        	
+        	String variableNames = "";
+        	String expressions = "";
+        	for(int i = 0; i < variable.size(); i++){
+        		
+        		variableNames += (variable.get(i).toString());
+        		if(i != variable.size() - 1)
+        			variableNames += ",";
+        		
+        	}
+        	
+        	for(int i = 0; i < exp.size(); i++){
+        		
+        		expressions += (exp.get(i).toString());
+        		if(i != variable.size() - 1)
+        			variableNames += ",";
+        		
+        	}
+        	
+            return variableNames + " := " + expressions;
         }
     }
-
+    
+    
     /** Tree node representing a "write" statement. */
     public static class WriteNode extends StatementNode {
         private ExpNode exp;
