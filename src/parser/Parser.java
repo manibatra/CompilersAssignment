@@ -49,7 +49,7 @@ import tree.UnaryOperator;
  *  CompoundStatement -> KW_BEGIN StatementList KW_END
  *  StatementList -> Statement { SEMICOLON Statement }
  *  Statement -> WhileStatement | IfStatement | CallStatement | Assignment | 
- *               ReadStatement | WriteStatement | CompoundStatement | SkipStatement | For
+ *               ReadStatement | WriteStatement | CompoundStatement | SkipStatement | ForStatement
  *  Assignment -> LValueList ASSIGN ConditionList
  *  WhileStatement -> KW_WHILE Condition KW_DO Statement
  *  IfStatement -> KW_IF Condition KW_THEN Statement KW_ELSE Statement
