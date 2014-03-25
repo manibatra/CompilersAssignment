@@ -49,13 +49,15 @@ import tree.UnaryOperator;
  *  CompoundStatement -> KW_BEGIN StatementList KW_END
  *  StatementList -> Statement { SEMICOLON Statement }
  *  Statement -> WhileStatement | IfStatement | CallStatement | Assignment | 
- *               ReadStatement | WriteStatement | CompoundStatement | SkipStatement
+ *               ReadStatement | WriteStatement | CompoundStatement | SkipStatement | For
  *  Assignment -> LValueList ASSIGN ConditionList
  *  WhileStatement -> KW_WHILE Condition KW_DO Statement
  *  IfStatement -> KW_IF Condition KW_THEN Statement KW_ELSE Statement
  *  CallStatement -> KW_CALL IDENTIFIER LPAREN RPAREN
  *  ReadStatement -> KW_READ LValue
  *  WriteStatement -> KW_WRITE Exp
+ *  Skip -> 
+ *  ForStatement -> KW_FOR IDENTIFIER COLON LBRACKET Condition RANGE Condition RBRACKET KW_DO Statement
  *  Condition -> Exp [ RelOp Exp ]
  *  ConditionList -> Condition { COMMA Condition }
  *  RelOp   -> EQUALS | NEQUALS | LEQUALS | LESS | GREATER | GEQUALS
@@ -84,7 +86,7 @@ public class Parser {
     private final static TokenSet STATEMENT_START_SET =
         LVALUE_START_SET.union( Token.KW_WHILE, Token.KW_IF,
           Token.KW_READ, Token.KW_WRITE,
-          Token.KW_CALL, Token.KW_BEGIN, Token.KW_SKIP );
+          Token.KW_CALL, Token.KW_BEGIN, Token.KW_SKIP, Token.KW_FOR );
     /** Set of tokens that may start a Declaration. */
     private final static TokenSet DECLARATION_START_SET =
         new TokenSet( Token.KW_CONST, Token.KW_TYPE, Token.KW_VAR, 
@@ -661,6 +663,9 @@ public class Parser {
         case KW_SKIP:
         	result = parseSkipStatement( recoverSet );
         	break;
+        case KW_FOR:
+        	result = parseForStatement( recoverSet );
+        	break;
         default:
             fatal( "parse Statement " );
             result = new StatementNode.ErrorNode( token.getPosn() );
@@ -779,6 +784,40 @@ public class Parser {
         endRule( "If Statement", recoverSet );
         return new StatementNode.IfNode( pos, cond, thenClause, elseClause );
     }
+    
+    /** Rule: ForStatement -> KW_FOR IDENTIFIER COLON LBRACKET Condition RANGE Condition 
+     * 							RBRACKET KW_DO Statement
+     */
+    private StatementNode parseForStatement( TokenSet recoverSet ) {
+        beginRule( "For Statement", Token.KW_FOR ); /* cannot fail */
+        match( Token.KW_FOR ); /* cannot fail */
+        Position pos = token.getPosn();
+        String id;
+        if(token.isMatch(Token.IDENTIFIER)){
+        	
+        	id = token.getName();
+        	
+        } else {
+        	
+        	id = "<no id>";
+        	
+        }
+        match(Token.IDENTIFIER, Token.COLON);
+        match(Token.COLON, Token.RBRACKET);
+        match(Token.LBRACKET, CONDITION_START_SET);
+        ExpNode lowerBound = parseCondition( recoverSet.union( Token.RANGE ) ); // should the recoverset just consist of range?
+        match( Token.RANGE, CONDITION_START_SET );
+        ExpNode upperBound = parseCondition( recoverSet.union( Token.RBRACKET ) );
+        match(Token.RBRACKET, recoverSet.union(Token.KW_DO));
+        match(Token.KW_DO, STATEMENT_START_SET);
+        StatementNode doStmt = 
+            parseStatement( recoverSet );
+       
+        endRule( "For Statement", recoverSet );
+        return new StatementNode.ForNode( pos, id, lowerBound, upperBound, doStmt  );
+    }
+    
+    
     /** Rule: ReadStatement -> KW_READ LValue */
     private StatementNode parseReadStatement( TokenSet recoverSet ) {
         beginRule( "Read Statement", Token.KW_READ ); /* cannot fail */

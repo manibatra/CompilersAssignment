@@ -77,7 +77,7 @@ public abstract class StatementNode {
         }
         @Override
         public String toString() {
-            return "skip";
+            return "Skip";
         }
     	
     	
@@ -334,6 +334,62 @@ public abstract class StatementNode {
         public String toString( ) {
             return "IF " + condition.toString() + " THEN " + thenStmt +
                 " ELSE " + elseStmt;
+        }
+    }
+    
+    /** Tree node representing an "if" statement. */
+    public static class ForNode extends StatementNode {
+    	private String id;
+    	private ExpNode lowerBound;
+        private ExpNode upperBound;
+        private StatementNode doStmt;
+        private SymEntry.VarEntry varEntry;
+
+        public ForNode( Position pos, String id,  ExpNode lowerBound, 
+                ExpNode upperBound, StatementNode doStmt ) {
+            super( pos );
+            this.id = id;
+            this.lowerBound = lowerBound;
+            this.upperBound = upperBound;
+            this.doStmt = doStmt;
+        }
+        @Override
+        public void accept( StatementVisitor visitor ) {
+            visitor.visitForNode( this );
+        }
+        @Override
+        public Code genCode( StatementTransform<Code> visitor ) {
+            return visitor.visitForNode( this );
+        }
+        public String getId() {
+            return id;
+        }
+        public ExpNode getLowerBound() {
+            return lowerBound;
+        }
+        public void setLowerBound( ExpNode lowerBound ) {
+            this.lowerBound = lowerBound;
+        }
+        
+        public ExpNode getUpperBound() {
+            return upperBound;
+        }
+        public void setUpperBound( ExpNode upperBound ) {
+            this.upperBound = upperBound;
+        }
+        public StatementNode getdoStmt() {
+            return doStmt;
+        }
+        public SymEntry.VarEntry getEntry() {
+            return varEntry;
+        }
+        public void setEntry(SymEntry.VarEntry entry) {
+            this.varEntry = entry;
+        }
+        @Override
+        public String toString( ) {
+            return "for " + varEntry.getIdent() + ": [" + lowerBound.toString() 
+            			+ ".." + upperBound.toString() + "] do " + doStmt;
         }
     }
 

@@ -26,4 +26,6 @@ public interface  StatementTransform<ResultType> {
     ResultType visitWhileNode( StatementNode.WhileNode node);
     
     ResultType visitSkipNode( StatementNode.SkipNode node);
+    
+    ResultType visitForNode( StatementNode.ForNode node);
 }

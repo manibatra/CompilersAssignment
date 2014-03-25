@@ -8,6 +8,6 @@ var
 begin
   lower := 101;
   upper := N;
-  for i: [lower..upper] do  // lower and upper bounds both subranges
-      write i
+  for i: [lower..upper] do  // lower and upper bounds both subrange , here just an LVALUE wil be matched 
+  	 write i  					//and later the value be substituted from Sym Table
 end
