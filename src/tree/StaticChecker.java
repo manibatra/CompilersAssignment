@@ -238,11 +238,11 @@ public class StaticChecker implements TreeVisitor, StatementVisitor,
     }
     public ExpNode visitUnaryOpNode( ExpNode.UnaryOpNode node ) {
         /* Unary operators aren't overloaded */
-        ExpNode subExp = node.getSubExp().transform( this );
+        ExpNode subExp = node.getSubExp().transform( this );//transforms the subexp, for eg identifier into constant
         Type.FunctionType fType = 
-            (Type.FunctionType)node.getOp().getType();
-        node.setSubExp( fType.getArgType().coerceExp( subExp ) );
-        node.setType( fType.getResultType() );
+            (Type.FunctionType)node.getOp().getType(); //checks the type of the operator 
+        node.setSubExp( fType.getArgType().coerceExp( subExp ) );//coerces subexp to operator, for eg subrange to int
+        node.setType( fType.getResultType() );//type of the result of unary operator
         return node;
     }
     public ExpNode visitArgumentsNode( ExpNode.ArgumentsNode node ) {
