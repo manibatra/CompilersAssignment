@@ -155,7 +155,7 @@ public class CodeGenerator
     
     /** Generate code for a "skip" statement. */
     public Code visitSkipNode( StatementNode.SkipNode node) {
-    	Code code = node.
+    	//Code code = node.
  
     }
 
