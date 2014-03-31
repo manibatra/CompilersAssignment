@@ -10,13 +10,11 @@ begin
   x,y,z,x := 1,2,3,4; // repeated variable on left
   x,x,x,x := 1,2,3,4; // repeated variable on left
   
-  x,b := true,1;          // both type incompatible
-  x,y,z,b := 1,2,false,3; // z and b assigned incompatible values
+ x,b := true,1;          // both type incompatible
+ x,y,z,b := 1,2,false,3; // z and b assigned incompatible values
   
-  c,x := true,true;  // cannot assign to a constant
-  
-  x,y,z := 1,2;  // too few expressions
-  x,y,z := 1;    // too few expressions
+ c,x := true,true; // cannot assign to a constant //if semicolon is removed then next error not read
+   x,y,z := 1;    // too few expressions
   a,y,z := ;     // too few expressions (syntax error)
 
   x,y := 1,2,3;  // too few lvalues
@@ -24,6 +22,8 @@ begin
   := 1,2,3;      // too few lvalues (syntax error)
 
   x = 1; // syntax error - should be :=
+  x,y,z := 1,2;  // too few expressions
+ 
 
   x := 1 // valid single assignment
 end

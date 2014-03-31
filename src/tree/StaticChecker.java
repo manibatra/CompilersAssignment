@@ -14,8 +14,10 @@ import syms.SymEntry;
 import syms.SymbolTable;
 import syms.Type;
 import syms.Type.IncompatibleTypes;
+import syms.Type.ReferenceType;
 import tree.DeclNode.DeclListNode;
 import tree.ExpNode.IdentifierNode;
+import tree.ExpNode.VariableNode;
 import tree.StatementNode.ForNode;
 import tree.StatementNode.SkipNode;
 import tree.Tree.*;
@@ -114,6 +116,9 @@ ExpTransform<ExpNode> {
 	//        }
 	//    }
 
+	
+	
+	
 	public void visitAssignmentNode(StatementNode.AssignmentNode node) {
 		// Check the left side left value.
 		List<ExpNode> left = new ArrayList<ExpNode>();
@@ -124,7 +129,8 @@ ExpTransform<ExpNode> {
 
 		for(ExpNode var : node.getVariable()){
 			//have to yet check for the case when two identifiers are the same 
-			left.add(var.transform( this ));
+						left.add(var.transform( this ));
+						
 			if(!(ids.add(((IdentifierNode)var).getId()))){
 
 				duplicates = true;
@@ -150,33 +156,48 @@ ExpTransform<ExpNode> {
 		for( ExpNode var : left) {
 
 			lvalType.add(var.getType());
-
+			//System.out.println(var.getType());
 		}
 
-		if(duplicates){
+		if(left.size() < exp.size()){
+
+			error("too few l-values", left.get(0).getPosition());
+
+		} else if(left.size() > exp.size()) {
+
+			error("too few expressions", left.get(0).getPosition());
+
+		} else if(duplicates){
 
 			error("there is one or more duplicate variables present", left.get(0).getPosition());
-			
+
 		} else {	
+			List<ExpNode> finalExp = new ArrayList<ExpNode>();
 			for(int i = 0; i < left.size(); i++) {
 
 				if( ! (lvalType.get(i) instanceof Type.ReferenceType) ) {
 
 					error( "variable (i.e. , L-Value) expected", left.get(i).getPosition() );
-				} {
+				} else  {
 					//yet to fix coercion
-					List<ExpNode> finalExp = new ArrayList<ExpNode>();
-					for(int j = 0; j < lvalType.size(); j++) {
+					if(symtab.lookupVariable(((ExpNode.VariableNode)left.get(i)).getId()).isControlVar()){
+						
+						error("value cannot be assigned to a control variable", left.get(i).getPosition());
+						
+					} else {
 
-						Type baseType = ((Type.ReferenceType)lvalType.get(j)).getBaseType();
-						finalExp.add( baseType.coerceExp( left.get(i)));
+
+					Type baseType = ((Type.ReferenceType)lvalType.get(i)).getBaseType();
+					finalExp.add( baseType.coerceExp( exp.get(i)));
 
 					}
 
-					node.setExp(finalExp);
 				}
 
 			}
+
+			node.setExp(finalExp);
+
 
 		} 
 
@@ -203,6 +224,64 @@ ExpTransform<ExpNode> {
 			error( "Procedure identifier required", node.getPosition() );
 			return;
 		}
+	}
+	
+	@Override
+	public void visitForNode(StatementNode.ForNode node) {
+		// TODO Auto-generated method stub
+
+		ExpNode lowerBound = node.getLowerBound().transform(this);
+		ExpNode upperBound = node.getUpperBound().transform(this);
+
+		node.setLowerBound(lowerBound);
+		node.setUpperBound(upperBound);
+
+		Type lowerT = lowerBound.getType();
+		
+		if( !(lowerT instanceof Type.ReferenceType) && !(lowerT instanceof Type.SubrangeType)
+				&& !(lowerT instanceof Type.ScalarType)) {
+			
+				error("the lower bound is of the wrong type", lowerBound.getPosition());
+			
+		} else {
+			
+			Type baseType;
+			
+			if(lowerT instanceof Type.ReferenceType){
+				
+				baseType = ((Type.ReferenceType)lowerT).getBaseType();
+				
+			} else if( lowerT instanceof Type.SubrangeType){
+				
+				baseType = ((Type.SubrangeType)lowerT).getBaseType();
+				
+			} else 
+				
+				baseType = lowerT;
+			
+			baseType.coerceExp(upperBound);
+			
+			symtab.extendCurrentScope();
+			
+			//System.out.println(node.getId());
+			
+			
+			SymEntry.VarEntry controlVar = symtab.addVariable(node.getId(), node.getPosition(), new ReferenceType(baseType));
+			
+			controlVar.setControlVar(true);
+			
+			node.getdoStmt().accept(this);
+			
+			symtab.leaveExtendedScope();
+			
+			
+			
+			
+		}
+
+		
+
+
 	}
 
 	public void visitStatementListNode( StatementNode.ListNode node ) {
@@ -396,13 +475,10 @@ ExpTransform<ExpNode> {
 		errors.errorMessage( message, Severity.FATAL, pos );
 	}
 	@Override
-	public void visitSkipNode(SkipNode node) {
+	public void visitSkipNode(StatementNode.SkipNode node) {
 		// TODO Auto-generated method stub
+		//do we add accept, as it doesnt have descendents
 
 	}
-	@Override
-	public void visitForNode(ForNode node) {
-		// TODO Auto-generated method stub
-
-	}
+	
 }

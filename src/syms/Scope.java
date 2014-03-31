@@ -80,7 +80,9 @@ public class Scope {
      */
     public SymEntry addEntry( SymEntry entry ) {
         if( entries.containsKey( entry.getIdent() ) ) {
-            return null;
+            System.out.println("In here");
+        	return null;
+            
         } else {
             entries.put( entry.getIdent(), entry );
             return entry;

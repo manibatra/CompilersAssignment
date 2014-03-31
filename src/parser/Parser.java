@@ -56,7 +56,7 @@ import tree.UnaryOperator;
  *  CallStatement -> KW_CALL IDENTIFIER LPAREN RPAREN
  *  ReadStatement -> KW_READ LValue
  *  WriteStatement -> KW_WRITE Exp
- *  Skip -> 
+ *  Skip -> KW_SKIP
  *  ForStatement -> KW_FOR IDENTIFIER COLON LBRACKET Condition RANGE Condition RBRACKET KW_DO Statement
  *  Condition -> Exp [ RelOp Exp ]
  *  ConditionList -> Condition { COMMA Condition }
@@ -674,7 +674,7 @@ public class Parser {
         return result;
     }
     
-    /** Rule : Skip -> */
+    /** Rule : Skip -> KW_SKIP */
     private StatementNode parseSkipStatement( TokenSet recoverSet ){
     	beginRule("Skip Statement", Token.KW_SKIP); //cannot fail
     	Position pos = token.getPosn();
