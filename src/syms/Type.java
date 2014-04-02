@@ -795,9 +795,12 @@ public abstract class Type
      * and returned, otherwise exp is returned unchanged.
      */
     public static ExpNode optDereference( ExpNode exp ) {
+    	
         Type fromType = exp.getType();
         if( fromType instanceof ReferenceType ) {
+        	System.out.println("adding a dereference node at "+exp.toString());
             return new ExpNode.DereferenceNode( 
+            		
                     ((ReferenceType)fromType).getBaseType(), exp );
         } else {
             return exp;

@@ -255,9 +255,12 @@ ExpTransform<ExpNode> {
 				
 				baseType = ((Type.SubrangeType)lowerT).getBaseType();
 				
-			} else 
+			} else {
 				
 				baseType = lowerT;
+			}	
+			
+			baseType.coerceExp(lowerBound);
 			
 			baseType.coerceExp(upperBound);
 			
@@ -271,6 +274,7 @@ ExpTransform<ExpNode> {
 			controlVar.setControlVar(true);
 			
 			node.getdoStmt().accept(this);
+		
 			
 			symtab.leaveExtendedScope();
 			
