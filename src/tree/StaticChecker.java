@@ -482,6 +482,7 @@ ExpTransform<ExpNode> {
 	public void visitSkipNode(StatementNode.SkipNode node) {
 		// TODO Auto-generated method stub
 		//do we add accept, as it doesnt have descendents
+		//the node is already added, you visit it and do nothing 
 
 	}
 	
