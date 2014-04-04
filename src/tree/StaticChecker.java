@@ -260,9 +260,9 @@ ExpTransform<ExpNode> {
 				baseType = lowerT;
 			}	
 			
-			baseType.coerceExp(lowerBound);
+			node.setLowerBound(baseType.coerceExp(lowerBound));
 			
-			baseType.coerceExp(upperBound);
+			node.setUpperBound(baseType.coerceExp(upperBound));
 			
 			symtab.extendCurrentScope();
 			
@@ -274,6 +274,8 @@ ExpTransform<ExpNode> {
 			controlVar.setControlVar(true);
 			
 			node.getdoStmt().accept(this);
+			
+			node.setEntry(controlVar);
 		
 			
 			symtab.leaveExtendedScope();

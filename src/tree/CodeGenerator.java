@@ -12,6 +12,7 @@ import source.Position;
 import source.Severity;
 import syms.SymEntry;
 import syms.Type;
+import syms.Type.SubrangeType;
 import tree.StatementNode.ForNode;
 import tree.Tree.*;
 
@@ -256,6 +257,63 @@ ExpTransform<Code> {
 		code.genJumpAlways( -(code.size() + Code.SIZE_JUMP_ALWAYS) );
 		return code;
 	}
+
+
+	@Override
+	public Code visitForNode(StatementNode.ForNode node) {
+
+		Code code = new Code();
+
+		SymEntry.VarEntry varEntry = node.getEntry();
+		
+		
+		//the initial code to be run once at the start of the for loop
+		Code initial = new Code();
+		initial.append(node.getLowerBound().genCode(this));
+		initial.genMemRef(staticLevel - varEntry.getLevel(), varEntry.getOffset());
+		initial.generateOp(Operation.STORE_FRAME);
+		initial.append(node.getUpperBound().genCode(this));
+		
+		
+		//body code //pop is added for execution of nested for loops
+		Code bodyCode = node.getdoStmt().genCode(this);
+		if(node.getdoStmt() instanceof StatementNode.ForNode)
+			bodyCode.generateOp(Operation.POP);
+
+
+		//code to increment and save the value of control var
+		//will be appended after body
+		Code increment = new Code();
+		increment.genMemRef(staticLevel - varEntry.getLevel(), varEntry.getOffset());
+		increment.generateOp(Operation.LOAD_FRAME);
+		increment.genLoadConstant(1);
+		increment.generateOp(Operation.ADD);
+		increment.genMemRef(staticLevel - varEntry.getLevel(), varEntry.getOffset());
+		increment.generateOp(Operation.STORE_FRAME);
+		
+		//append the initial code and duplicate the value of the upper bound
+		//so that it is always there on the stack
+		code.append(initial);
+		code.generateOp(Operation.DUP);
+
+		//getting the value of the control var to compare with upper bound
+		code.genMemRef(staticLevel - varEntry.getLevel(), varEntry.getOffset());
+		code.generateOp(Operation.LOAD_FRAME);
+
+		//swapping the top two values on stack and comparing
+		code.generateOp(Operation.SWAP);
+		code.generateOp(Operation.LESSEQ);
+
+		//jump if false over the body statement and the save value statement
+		code.genLoadConstant(bodyCode.size() + increment.size() + Code.SIZE_JUMP_ALWAYS);
+		code.generateOp(Operation.BR_FALSE);
+		code.append(bodyCode);
+		code.append(increment);
+		code.genJumpAlways(-(code.size()) + initial.size() - Code.SIZE_JUMP_ALWAYS );
+		
+		return code;
+	}
+
 	/*************************************************
 	 *  Expression node code generation visit methods
 	 *************************************************/
@@ -425,10 +483,5 @@ ExpTransform<Code> {
 		errors.errorMessage( message, Severity.FATAL, pos);
 	}
 
-	@Override
-	public Code visitForNode(ForNode node) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

@@ -798,7 +798,6 @@ public abstract class Type
     	
         Type fromType = exp.getType();
         if( fromType instanceof ReferenceType ) {
-        	System.out.println("adding a dereference node at "+exp.toString());
             return new ExpNode.DereferenceNode( 
             		
                     ((ReferenceType)fromType).getBaseType(), exp );
