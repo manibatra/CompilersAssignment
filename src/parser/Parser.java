@@ -684,21 +684,7 @@ public class Parser {
     	 
     }
     
-    
-//    /** Rule: Assignment -> LValueList ASSIGN ConditionList */
-//    private StatementNode.AssignmentNode parseAssignment(TokenSet recoverSet) {
-//        beginRule( "Assignment", LVALUE_START_SET, recoverSet );
-//        /* Non-standard recovery set includes EQUALS because a common syntax
-//         * error is to use EQUALS instead of ASSIGN.
-//         */
-//        ExpNode left = parseLValue( 
-//                recoverSet.union( Token.ASSIGN, Token.EQUALS ) );
-//        Position pos = token.getPosn();
-//        match( Token.ASSIGN, CONDITION_START_SET );
-//        ExpNode right = parseCondition( recoverSet );
-//        endRule( "Assignment", recoverSet );
-//        return new StatementNode.AssignmentNode( pos, left, right );
-//    }
+
     
     /** Rule: Assignment -> LValueList ASSIGN ConditionList */
     private StatementNode.AssignmentNode parseAssignment(TokenSet recoverSet) {

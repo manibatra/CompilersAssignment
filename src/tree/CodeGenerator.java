@@ -309,7 +309,7 @@ ExpTransform<Code> {
 		code.generateOp(Operation.BR_FALSE);
 		code.append(bodyCode);
 		code.append(increment);
-		code.genJumpAlways(-(code.size()) + initial.size() - Code.SIZE_JUMP_ALWAYS );
+		code.genJumpAlways(-(code.size() + Code.SIZE_JUMP_ALWAYS) + initial.size()  );
 		
 		return code;
 	}

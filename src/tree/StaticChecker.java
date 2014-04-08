@@ -94,28 +94,6 @@ ExpTransform<ExpNode> {
 	public void visitStatementErrorNode(StatementNode.ErrorNode node) {
 		// Nothing to check - already invalid.
 	}
-
-	//    public void visitAssignmentNode(StatementNode.AssignmentNode node) {
-	//        // Check the left side left value.
-	//        ExpNode left = node.getVariable().transform( this );
-	//        node.setVariable( left );
-	//        // Check the right side expression.
-	//        ExpNode exp = node.getExp().transform( this );
-	//        node.setExp( exp );
-	//        // Validate that it is a true left value and not a constant.
-	//        Type lvalType = left.getType();
-	//        if( ! (lvalType instanceof Type.ReferenceType) ) {
-	//            error( "variable (i.e., L-Value) expected", left.getPosition() );
-	//        } else {
-	//            /* Validate that the right expression is assignment
-	//             * compatible with the left value. This may require that the 
-	//             * right side expression is coerced to the dereferenced
-	//             * type of the left side LValue. */
-	//            Type baseType = ((Type.ReferenceType)lvalType).getBaseType();
-	//            node.setExp( baseType.coerceExp( exp ) );
-	//        }
-	//    }
-
 	
 	
 	
