@@ -94,9 +94,9 @@ ExpTransform<ExpNode> {
 	public void visitStatementErrorNode(StatementNode.ErrorNode node) {
 		// Nothing to check - already invalid.
 	}
-	
-	
-	
+
+
+
 	public void visitAssignmentNode(StatementNode.AssignmentNode node) {
 		// Check the left side left value.
 		List<ExpNode> left = new ArrayList<ExpNode>();
@@ -107,8 +107,8 @@ ExpTransform<ExpNode> {
 
 		for(ExpNode var : node.getVariable()){
 			//have to yet check for the case when two identifiers are the same 
-						left.add(var.transform( this ));
-						
+			left.add(var.transform( this ));
+
 			if(!(ids.add(((IdentifierNode)var).getId()))){
 
 				duplicates = true;
@@ -137,47 +137,49 @@ ExpTransform<ExpNode> {
 			//System.out.println(var.getType());
 		}
 
-		if(left.size() < exp.size()){
-
-			error("too few l-values", left.get(0).getPosition());
-
-		} else if(left.size() > exp.size()) {
-
-			error("too few expressions", left.get(0).getPosition());
-
-		} else if(duplicates){
+		if(duplicates){
 
 			error("there is one or more duplicate variables present", left.get(0).getPosition());
 
-		} else {	
-			List<ExpNode> finalExp = new ArrayList<ExpNode>();
-			for(int i = 0; i < left.size(); i++) {
+		} else
 
-				if( ! (lvalType.get(i) instanceof Type.ReferenceType) ) {
+			if(left.size() < exp.size()){
 
-					error( "variable (i.e. , L-Value) expected", left.get(i).getPosition() );
-				} else  {
-					//yet to fix coercion
-					if(symtab.lookupVariable(((ExpNode.VariableNode)left.get(i)).getId()).isControlVar()){
-						
-						error("value cannot be assigned to a control variable", left.get(i).getPosition());
-						
-					} else {
+				error("too few l-values", left.get(0).getPosition());
+
+			} else if(left.size() > exp.size()) {
+
+				error("too few expressions", left.get(0).getPosition());
+
+			}  else {	
+				List<ExpNode> finalExp = new ArrayList<ExpNode>();
+				for(int i = 0; i < left.size(); i++) {
+
+					if( ! (lvalType.get(i) instanceof Type.ReferenceType) ) {
+
+						error( "variable (i.e. , L-Value) expected", left.get(i).getPosition() );
+					} else  {
+						//yet to fix coercion
+						if(symtab.lookupVariable(((ExpNode.VariableNode)left.get(i)).getId()).isControlVar()){
+
+							error("value cannot be assigned to a control variable", left.get(i).getPosition());
+
+						} else {
 
 
-					Type baseType = ((Type.ReferenceType)lvalType.get(i)).getBaseType();
-					finalExp.add( baseType.coerceExp( exp.get(i)));
+							Type baseType = ((Type.ReferenceType)lvalType.get(i)).getBaseType();
+							finalExp.add( baseType.coerceExp( exp.get(i)));
+
+						}
 
 					}
 
 				}
 
-			}
-
-			node.setExp(finalExp);
+				node.setExp(finalExp);
 
 
-		} 
+			} 
 
 	}
 
@@ -203,11 +205,11 @@ ExpTransform<ExpNode> {
 			return;
 		}
 	}
-	
+
 	@Override
 	public void visitForNode(StatementNode.ForNode node) {
 		// TODO Auto-generated method stub
-
+		//getting the upper and lower bounds
 		ExpNode lowerBound = node.getLowerBound().transform(this);
 		ExpNode upperBound = node.getUpperBound().transform(this);
 
@@ -215,56 +217,42 @@ ExpTransform<ExpNode> {
 		node.setUpperBound(upperBound);
 
 		Type lowerT = lowerBound.getType();
-		
+
 		if( !(lowerT instanceof Type.ReferenceType) && !(lowerT instanceof Type.SubrangeType)
 				&& !(lowerT instanceof Type.ScalarType)) {
-			
-				error("the lower bound is of the wrong type", lowerBound.getPosition());
-			
+			error("the lower bound is of the wrong type", lowerBound.getPosition());
 		} else {
-			
+			//setting the base type of the control variable
+			//also checking if the lower and upper bounds are of same basetype
 			Type baseType;
-			
 			if(lowerT instanceof Type.ReferenceType){
-				
 				baseType = ((Type.ReferenceType)lowerT).getBaseType();
-				
 			} else if( lowerT instanceof Type.SubrangeType){
-				
 				baseType = ((Type.SubrangeType)lowerT).getBaseType();
-				
 			} else {
-				
 				baseType = lowerT;
 			}	
-			
+
+			//dereference nodes are added when the expressions are coerced
 			node.setLowerBound(baseType.coerceExp(lowerBound));
-			
 			node.setUpperBound(baseType.coerceExp(upperBound));
-			
-			symtab.extendCurrentScope();
-			
-			//System.out.println(node.getId());
-			
-			
-			SymEntry.VarEntry controlVar = symtab.addVariable(node.getId(), node.getPosition(), new ReferenceType(baseType));
-			
+
+			//extending the scope due to for loop body
+			symtab.extendCurrentScope();			
+
+			//adding and setting the control variable
+			SymEntry.VarEntry controlVar = symtab.addVariable(node.getId(), node.getPosition(),
+					new ReferenceType(baseType));
+
 			controlVar.setControlVar(true);
-			
+
 			node.getdoStmt().accept(this);
-			
 			node.setEntry(controlVar);
-		
-			
+
+			//finishing the for loop body
 			symtab.leaveExtendedScope();
-			
-			
-			
-			
+
 		}
-
-		
-
 
 	}
 
@@ -465,5 +453,5 @@ ExpTransform<ExpNode> {
 		//the node is already added, you visit it and do nothing 
 
 	}
-	
+
 }

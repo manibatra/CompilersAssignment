@@ -125,49 +125,27 @@ ExpTransform<Code> {
 	}
 
 	/** Code generation for an assignment statement. */
-	//    public Code visitAssignmentNode(StatementNode.AssignmentNode node) {
-	//        /* Generate code to evaluate the expression */
-	//        Code code = node.getExp().genCode( this );
-	//        /* Generate the code to load the address of the variable */
-	//        code.append( node.getVariable().genCode( this ) );
-	//        Type.ReferenceType refType = 
-	//            (Type.ReferenceType)node.getVariable().getType();
-	//        int size = refType.getBaseType().getSpace();
-	//        if (size == 1) {
-	//            /* For an expression that can fit in a single word,
-	//             *  store that into the variable.
-	//             */
-	//            code.generateOp( Operation.STORE_FRAME );
-	//        } else {
-	//            /* For the assignment of one multi-word variable to another 
-	//             * generate a STORE_MULTI instruction to store the entire value.
-	//             */
-	//            code.genLoadConstant(size);
-	//            code.generateOp(Operation.STORE_MULTI);
-	//        }
-	//        return code;
-	//    }
+	
 
 
 	public Code visitAssignmentNode(StatementNode.AssignmentNode node) {
-		/* Generate code to evaluate the expression */
+		/* Generate code to evaluate the expression  and the variables
+		 * alternatively*/
 		Code code = new Code();
 
 		for(int i= 0; i < node.getExp().size(); i++) {
-
 			code.append(node.getExp().get(i).genCode(this));
 			code.append(node.getVariable().get(i).genCode(this));
-
-
-
-
 		}
-
+		
+		/* start in the reverse order */
 		for(int i= node.getExp().size() - 1; i >= 0; i--) {
 
 			Type.ReferenceType refType = 
 					(Type.ReferenceType)node.getVariable().get(i).getType();
+			
 			int size = refType.getBaseType().getSpace();
+			
 			if (size == 1) {
 				/* For an expression that can fit in a single word,
 				 *  store that into the variable.
