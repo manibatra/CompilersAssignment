@@ -791,7 +791,7 @@ public class Parser {
         match(Token.IDENTIFIER, Token.COLON);
         match(Token.COLON, Token.RBRACKET);
         match(Token.LBRACKET, CONDITION_START_SET);
-        ExpNode lowerBound = parseCondition( recoverSet.union( Token.RANGE ) ); // should the recoverset just consist of range?
+        ExpNode lowerBound = parseCondition( recoverSet.union( Token.RANGE ) ); 
         match( Token.RANGE, CONDITION_START_SET );
         ExpNode upperBound = parseCondition( recoverSet.union( Token.RBRACKET ) );
         match(Token.RBRACKET, recoverSet.union(Token.KW_DO));

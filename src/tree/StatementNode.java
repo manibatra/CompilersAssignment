@@ -61,6 +61,7 @@ public abstract class StatementNode {
         }
     }
     
+    /** Tree node representing a Skip statement. */
     public static class SkipNode extends StatementNode {
     	
     	public SkipNode ( Position pos ){
@@ -83,51 +84,6 @@ public abstract class StatementNode {
     	
     }
 
-//    /** Tree node representing an assignment statement. */
-//    public static class AssignmentNode extends StatementNode {
-//        /** Tree node for expression on left hand side of an assignment. */
-//        private ExpNode variable;
-//        /** Tree node for the expression to be assigned. */
-//        private ExpNode exp;
-//
-//        public AssignmentNode( Position pos, ExpNode variable, 
-//                ExpNode exp ) {
-//            super( pos );
-//            this.variable = variable;
-//            this.exp = exp;
-//        }
-//        @Override
-//        public void accept( StatementVisitor visitor ) {
-//            visitor.visitAssignmentNode( this );
-//        }
-//        @Override
-//        public Code genCode( StatementTransform<Code> visitor ) {
-//            return visitor.visitAssignmentNode( this );
-//        }
-//        public ExpNode getVariable() {
-//            return variable;
-//        }
-//        public void setVariable( ExpNode variable ) {
-//            this.variable = variable;
-//        }
-//        public ExpNode getExp() {
-//            return exp;
-//        }
-//        public void setExp(ExpNode exp) {
-//            this.exp = exp;
-//        }
-//        public String getVariableName() {
-//            if( variable instanceof ExpNode.VariableNode ) {
-//                return ((ExpNode.VariableNode)variable).getId();
-//            } else {
-//                return "<noname>";
-//            }
-//        }
-//        @Override
-//        public String toString( ) {
-//            return variable.toString() + " := " + exp.toString();
-//        }
-//    }
 
     /** Tree node representing an assignment statement. */
     public static class AssignmentNode extends StatementNode {
@@ -337,7 +293,7 @@ public abstract class StatementNode {
         }
     }
     
-    /** Tree node representing an "if" statement. */
+    /** Tree node representing a "for" statement. */
     public static class ForNode extends StatementNode {
     	private String id;
     	private ExpNode lowerBound;
